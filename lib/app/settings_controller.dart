@@ -18,6 +18,11 @@ class SettingsController extends ChangeNotifier {
   AppTheme _appTheme = AppTheme.myQuran;
   bool _isHorizontalScrolling = true;
   bool _keepScreenOn = true;
+  bool _autoScrollEnabled = false;
+  int _autoScrollIntervalMs = 20000;
+
+
+
   TextAlignOption _textAlign = TextAlignOption.justify;
   bool _supportsDynamicColor = false;
   ColorScheme? _deviceLightScheme;
@@ -31,6 +36,20 @@ class SettingsController extends ChangeNotifier {
   bool get supportsDynamicColor => _supportsDynamicColor;
   AppTheme get appTheme => _appTheme;
   bool get keepScreenOn => _keepScreenOn;
+  bool get autoScrollEnabled => _autoScrollEnabled;
+  int get autoScrollIntervalMs => _autoScrollIntervalMs;
+
+  set autoScrollEnabled(bool value) {
+    _autoScrollEnabled = value;
+    settingsService.setAutoScrollEnabled(value);
+    notifyListeners();
+  }
+
+  set autoScrollIntervalMs(int value) {
+    _autoScrollIntervalMs = value;
+    settingsService.setAutoScrollIntervalMs(value);
+    notifyListeners();
+  }
   bool get isHorizontalScrolling => _isHorizontalScrolling;
   String get language => _language;
   FontFamily get fontFamily => _fontFamily;
@@ -150,6 +169,11 @@ class SettingsController extends ChangeNotifier {
     _isHorizontalScrolling = await settingsService.loadIsHorizontalScroling();
     _themeMode = await settingsService.loadThemeMode();
     _keepScreenOn = await settingsService.loadKeepScreenOn();
+    final loadedInterval = await settingsService.loadAutoScrollIntervalMs();
+    _autoScrollIntervalMs = loadedInterval.clamp(5000, 60000);
+
+
+
     _textAlign = await settingsService.loadTextAlign();
     _useTrueBlackBgColor = await settingsService.loadUseTrueBlackBgColor();
     _hizbDisplay = await settingsService.loadHizbDisplay();
